@@ -119,7 +119,22 @@ def get_line_input():
 
 def tokenise(line):
     """ Splits a line into tokens. """
-    tokens = line.split(' ')
+    tokens = []
+    line = ''.join(line.split(' '))
+    i = 0
+    while i < len(line):
+        pointer = i
+        if is_operator(line[i]):
+            tokens.append(line[i])
+            i = i + 1
+            continue
+
+        while pointer < len(line) and line[pointer].isdigit():
+            pointer = pointer + 1
+
+        tokens.append(line[i:pointer])
+        i = pointer
+
     return tokens
 
 def perform_var_assignment(tokens, variables_map):
@@ -150,7 +165,7 @@ def perform_expression_parsing(expressions, operators):
             operation = BinOpApp(OPERATION_TABLE[operator2], expr2, expr3)
 
             expressions.append(operation)
-            # Unused operatr and expression are pushed back onto the stack.
+            # Unused operator and expression are pushed back onto the stack.
             operators.append(operator)
             expressions.append(expr1)
             continue
@@ -201,4 +216,5 @@ def main():
             print('= {}'.format(result))
 
         line = get_line_input()
+
 main()

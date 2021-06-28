@@ -1,0 +1,44 @@
+"""
+Common functions and definitions module.
+"""
+
+def add(num1, num2):
+     """ Adds two given numbers """
+     return num1 + num2
+
+def multiply(num1, num2):
+     """ Multiplies two given numbers """
+     return num1 * num2
+
+def divide(num1, num2):
+     """ Divides two given numbers """
+     return num1 / num2
+
+def subtract(num1, num2):
+     """ Substracts two given numbers """
+     return num1 - num2
+
+def is_operator(operator):
+    """ Checks if a given character is an operator. """
+    return operator in ('+', '-', '*', '/')
+
+OPERATOR_TABLE = {
+     add: '+',
+     subtract: '-',
+     multiply: '*',
+     divide: '/'
+}
+
+OPERATION_TABLE = {
+     '+': add,
+     '-': subtract,
+     '*': multiply,
+     '/': divide
+}
+
+PRECEDENCE = {
+     '+': 1,
+     '-': 1,
+     '*': 2,
+     '/': 2
+}

@@ -18,9 +18,13 @@ def subtract(num1, num2):
      """ Substracts two given numbers """
      return num1 - num2
 
+def exponentiate(num1, num2):
+    """ Raises num1 to the power of num2 """
+    return num1**num2
+
 def is_operator(operator):
     """ Checks if a given character is an operator. """
-    return operator in ('+', '-', '*', '/')
+    return operator in ('+', '-', '*', '/', '(', ')')
 
 OPERATOR_TABLE = {
      add: '+',
@@ -33,12 +37,14 @@ OPERATION_TABLE = {
      '+': add,
      '-': subtract,
      '*': multiply,
-     '/': divide
+     '/': divide,
+     '^': exponentiate
 }
 
 PRECEDENCE = {
      '+': 1,
      '-': 1,
      '*': 2,
-     '/': 2
+     '/': 2,
+     '^': 3
 }

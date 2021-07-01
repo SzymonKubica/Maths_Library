@@ -16,7 +16,19 @@ def assemble_expression(expressions, operators):
     while len(operators) > 0:
         operator = operators.pop()
         expr1 = expressions.pop()
-        expr2 = expressions.pop()
+        expr2 = None
+        if operator == ')':
+            operators_in_parens = []
+            expressions_in_parens = []
+            while(operator != '('):
+                operators_in_parens.insert(0, operator)
+                expressions_in_parens.insert(0, expressions.pop())
+                expressions_in_parens.insert(0, expressions.pop())
+
+            expr2 = asseble_expression(operators_in_parens, expressions_in_parens)
+            operators.pop()
+        else: 
+            expr2 = expressions.pop()
 
         if (len(operators) > 0 and
                 prec[operators[len(operators) - 1]] > prec[operator]):
@@ -34,6 +46,9 @@ def assemble_expression(expressions, operators):
 
         operation = BinOpApp(op_table[operator], expr2, expr1)
         expressions.append(operation)
+
+    return expressions.pop()
+
 
 def perform_var_assignment(tokens, variables_map):
     """
@@ -53,9 +68,13 @@ def process_variable(token, variables_map, expressions):
 def process_operator(token, tokens, operators, expressions):
     """ Appends expressions depending on the operator"""
     next_token = tokens[0]
-
-    if next_token.isdigit():
+    if is_paren(token):
         operators.append(token)
+    elif next_token.isdigit():
+        operators.append(token)
+    elif is_paren(next_token):
+        operators.append(token)
+        operators.append(next_token)
     else:
         # Case with two operators next to each other, e.g. '2 + -2'
         assert(next_token == '-'), 'Invalid syntax: {0}{1}'.format(token, next_token)
@@ -89,5 +108,4 @@ def parse(tokens, variables_map):
         else:
             process_variable(token, variables_map, expressions)
 
-    assemble_expression(expressions, operators)
-    return expressions.pop()
+    return assemble_expression(expressions, operators)

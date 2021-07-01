@@ -26,6 +26,10 @@ def is_operator(operator):
     """ Checks if a given character is an operator. """
     return operator in ('+', '-', '*', '/', '^', '(', ')')
 
+def is_paren(operator):
+    """ Checks if a given operator is a parenthese """
+    return operator in ('(',')')
+
 OPERATOR_TABLE = {
     add: '+',
     subtract: '-',
@@ -43,9 +47,12 @@ OPERATION_TABLE = {
 }
 
 PRECEDENCE = {
+    '(': 0,
     '+': 1,
     '-': 1,
     '*': 2,
     '/': 2,
-    '^': 3
+    '^': 3,
+    ')': 4
+
 }

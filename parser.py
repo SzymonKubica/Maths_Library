@@ -7,15 +7,7 @@ from expressions import *
 Parser module: parses the list of tokens into an algebraic expression.
 """
 
-def perform_var_assignment(tokens, variables_map):
-    """
-    Performs an assignment of a new variable.
-    """
-    variable_name = tokens[0]
-    variable_value = int(tokens[2])
-    variables_map[variable_name] = variable_value
-
-def perform_expression_parsing(expressions, operators):
+def assemble_expression(expressions, operators):
     """
     Parses an expression by first interpreting all of the tokens
     and then assembling a single algebraic expression
@@ -27,7 +19,7 @@ def perform_expression_parsing(expressions, operators):
         expr2 = expressions.pop()
 
         if (len(operators) > 0 and
-            prec[operators[len(operators) - 1]] > prec[operator])    :
+                prec[operators[len(operators) - 1]] > prec[operator]):
             # If the next operator in the stack has higher PRECEDENCE,
             # we need to process it first.
             expr3 = expressions.pop()
@@ -43,28 +35,42 @@ def perform_expression_parsing(expressions, operators):
         operation = BinOpApp(op_table[operator], expr2, expr1)
         expressions.append(operation)
 
-def declare_variable(token, variables_map, expressions):
+def perform_var_assignment(tokens, variables_map):
+    """
+    Performs an assignment of a new variable.
+    """
+    variable_name = tokens[0]
+    variable_value = int(tokens[2])
+    variables_map[variable_name] = variable_value
+
+def process_variable(token, variables_map, expressions):
     """ Parses a variable expression. """
     if token not in variables_map.keys():
         print('Variable {} is undefined.'.format(token))
         return
     expressions.append(Variable(token, variables_map[token]))
 
-def process_operator(token, tokens, operators, expressions, pointer):
-    next_token = tokens[tokens.index(token) + 1]
+def process_operator(token, tokens, operators, expressions):
+    """ Appends expressions depending on the operator"""
+    next_token = tokens[0]
+
     if next_token.isdigit():
         operators.append(token)
-        return pointer
     else:
+        # Case with two operators next to each other, e.g. '2 + -2'
         assert(next_token == '-'), 'Invalid syntax: {0}{1}'.format(token, next_token)
-        successor_token = tokens[tokens.index(next_token) + 1]
+
+        successor_token = tokens[1]
         assert(successor_token.isdigit()), 'Invalid syntax.'
         operators.append(token)
         expressions.append(Constant(int(successor_token) * -1))
-        return pointer + 2
-        
-        
+        tokens.pop(0)
+        tokens.pop(0)
 
+def process_constant(token, expressions):
+    expressions.append(Constant(int(token)))
+    
+        
 def parse(tokens, variables_map):
     """ Parses a list of tokens to assemble an expression. """
     expressions = []
@@ -74,16 +80,14 @@ def parse(tokens, variables_map):
         perform_var_assignment(tokens, variables_map)
         return Assignment('Assignment')
 
-    pointer = 0
-    while pointer < len(tokens):
-        token = tokens[pointer]
+    while tokens:
+        token = tokens.pop(0)
         if token.isdigit():
-            expressions.append(Constant(int(token)))
+            process_constant(token, expressions)
         elif is_operator(token):
-            pointer = process_operator(token, tokens, operators, expressions, pointer) 
+            process_operator(token, tokens, operators, expressions) 
         else:
-            declare_variable(token, variables_map, expressions)
-        pointer = pointer + 1
+            process_variable(token, variables_map, expressions)
 
-    perform_expression_parsing(expressions, operators)
+    assemble_expression(expressions, operators)
     return expressions.pop()

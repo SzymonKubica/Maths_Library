@@ -54,13 +54,15 @@ def process_operator(token, tokens, operators, expressions, pointer):
     next_token = tokens[tokens.index(token) + 1]
     if next_token.isdigit():
         operators.append(token)
+        return pointer
     else:
         assert(next_token == '-'), 'Invalid syntax: {0}{1}'.format(token, next_token)
         successor_token = tokens[tokens.index(next_token) + 1]
         assert(successor_token.isdigit()), 'Invalid syntax.'
         operators.append(token)
         expressions.append(Constant(int(successor_token) * -1))
-        pointer = pointer + 1
+        return pointer + 2
+        
         
 
 def parse(tokens, variables_map):
@@ -78,13 +80,10 @@ def parse(tokens, variables_map):
         if token.isdigit():
             expressions.append(Constant(int(token)))
         elif is_operator(token):
-            process_operator(token, tokens, operators, expressions, pointer) 
+            pointer = process_operator(token, tokens, operators, expressions, pointer) 
         else:
             declare_variable(token, variables_map, expressions)
         pointer = pointer + 1
-
-    print(expressions)
-    print(operators)
 
     perform_expression_parsing(expressions, operators)
     return expressions.pop()
